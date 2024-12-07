@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú de Comida</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1c1c1c;
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px;
+            font-size: 2.5em;
+            color: #ff6600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        nav {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            background-color: #1c1c1c;
+            padding: 10px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            border-right: 2px solid #ff6600;
+            z-index: 1000;
+        }
+        nav button {
+            margin: 5px 0;
+            padding: 12px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        nav button:hover {
+            background-color: #e55500;
+            transform: scale(1.1);
+        }
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 50px auto;
+            padding: 20px;
+            max-width: 800px;
+        }
+        .menu-section {
+            width: 100%;
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        .menu-section h2 {
+            color: #ff6600;
+            border-bottom: 2px solid #ff6600;
+            padding-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 15px;
+            background-color: #1c1c1c;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+        .item img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            object-fit: contain;
+        }
+        .item button {
+            padding: 8px 15px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .item button:hover {
+            background-color: #e55500;
+            transform: scale(1.1);
+        }
+        #cart {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            background-color: #1c1c1c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+        }
+        #cart h3 {
+            margin: 0 0 10px;
+            color: #ff6600;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .cart-item button {
+            padding: 5px;
+            background-color: #e55500;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .cart-item button:hover {
+            background-color: #cc4400;
+        }
+        #pay-button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        #pay-button:hover {
+            background-color: #e55500;
+            transform: scale(1.05);
+        }
+
+        #pago-button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        #pago-button:hover {
+            background-color: #e55500;
+            transform: scale(1.05);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #1c1c1c;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+        }
+        .modal-content h3 {
+            margin: 10px 0;
+            color: #ff6600;
+        }
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 28px;
+            text-align: center;
+        }
+        .close:hover {
+            background: #e55500;
+        }
+        #confirm-button, #thank-you-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        #confirm-button:hover, #thank-you-button:hover {
+            background-color: #e55500;
+            transform: scale(1.05);
+        }
+
+        /* Estilos para el modal de agradecimiento */
+        #thank-you-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #1c1c1c;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+            color: white;
+        }
+
+        #thank-you-discount {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff6600;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .close:hover {
+            background: #e55500;
+        }
+
+        #thank-you-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #thank-you-button:hover {
+            background-color: #e55500;
+            transform: scale(1.05);
+        }
+
+        .imglogo {
+            width: 25%;
+            animation: constant-heartbeat 3.0s infinite linear;
+        }
+
+        @keyframes constant-heartbeat {
+            0%, 50%, 100% {
+                transform: scale(1);
+            }
+            25%, 75% {
+                transform: scale(1.2);
+            }
+        }
+
+        span{
+            font-weight: 600;
+        }
+        
+
+    </style>
+</head>
+<body>
+    <h1> <img class="imglogo" src="img_fastfuel/horizontal_logo.svg" alt=""> </h1>
+
+    <!-- Navigation Buttons -->
+    <nav>
+        <button onclick="scrollToSection('entrantes')">Entrantes</button>
+        <button onclick="scrollToSection('combos')">Hamburguesas</button>
+        <button onclick="scrollToSection('bebidas')">Bebidas</button>
+        <button onclick="scrollToSection('postres')">Postres</button>
+    </nav>
+
+    <!-- Menu Content -->
+    <div class="menu-container">
+        <div class="menu-section" id="entrantes">
+            <h2>Entrantes</h2>
+            <div class="item">
+                <img src="./img_comida/Entradas/Ensalada_cesar.png" alt="Ensalada César">
+                <span>Ensalada César - €1.24</span>
+                <button onclick="addToCart('Ensalada César', 1.24)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Entradas/Dedos_Mozzarella.png" alt="Dedos de Mozzarella">
+                <span>Dedos de Mozzarella - €4.99</span>
+                <button onclick="addToCart('Dedos de Mozzarella', 4.99)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Entradas/Nachos_Queso.png" alt="Nachos con Queso y Guacamole">
+                <span>Nachos con Queso y Guacamole - €5.99</span>
+                <button onclick="addToCart('Nachos con Queso y Guacamole', 5.99)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Entradas/Aros_Cebolla.png" alt="Aros de Cebolla">
+                <span>Aros de Cebolla - €3.99</span>
+                <button onclick="addToCart('Aros de Cebolla', 3.99)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Entradas/Tiras_Bufalo.png" alt="Tiras de Pollo Buffalo">
+                <span>Tiras de Pollo Buffalo - €6.49</span>
+                <button onclick="addToCart('Tiras de Pollo Buffalo', 6.49)">Agregar</button>
+            </div>
+            <!-- Items here -->
+        </div>
+        <div class="menu-section" id="combos">
+            <h2>Hamburguesas</h2>
+            <div class="item">
+                <img src="./img_comida/Hamburguesas/HamburguesaBQQ.png" alt="Hamburguesa FastFuel BBQ Deluxe">
+                <span>Hamburguesa FastFuel BBQ Deluxe - €7.99</span>
+                <button onclick="addToCart('Hamburguesa FastFuel BBQ Deluxe', 7.99)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Hamburguesas/HamburguesaSpicy.png" alt="Hamburguesa Spicy Fuel Inferno">
+                <span>Hamburguesa Spicy Fuel Inferno - $8.49</span>
+                <button onclick="addToCart('Hamburguesa Spicy Fuel Inferno', 8.49)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Hamburguesas/HamburguesaVeggie.png" alt="Hamburguesa Veggie Power">
+                <span>Hamburguesa Veggie Power - $6.99</span>
+                <button onclick="addToCart('Hamburguesa Veggie Power', 6.99)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Hamburguesas/HamburguesaFFDeluxerRanch.png" alt="Hamburguesa Fuel Deluxe Ranch">
+                <span>Hamburguesa Fuel Deluxe Ranch - $7.49</span>
+                <button onclick="addToCart('Hamburguesa Fuel Deluxe Ranch', 7.49)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Hamburguesas/HamburguesaFFDeluxe.png" alt="Hamburguesa FastFuel Deluxe">
+                <span>Hamburguesa FastFuel Deluxe - $8.29</span>
+                <button onclick="addToCart('Hamburguesa FastFuel Deluxe', 8.29)">Agregar</button>
+            </div>
+            <!-- Items here -->
+        </div>
+        <div class="menu-section" id="bebidas">
+            <h2>Bebidas</h2>
+            <div class="item">
+                <img src="./img_comida/Bebidas/Lata_CocaCola.png" alt="Lata Coca-Cola Clásica">
+                <span>Lata Coca-Cola Clásica - €1.49</span>
+                <button onclick="addToCart('Lata Coca-Cola Clásica', 1.49)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Bebidas/FastFuel_Energy.png" alt="Fast Fuel Energy Splash">
+                <span>Fast Fuel Energy Splash (500ml) - €1.99</span>
+                <button onclick="addToCart('Fast Fuel Energy Splash', 1.99)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Bebidas/Lata_Pepsi.png" alt="Lata Pepsi Zero">
+                <span>Lata Pepsi Zero - €1.49</span>
+                <button onclick="addToCart('Lata Pepsi Zero', 1.49)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Bebidas/FuelShake.png" alt="FuelShake Tropical Mix">
+                <span>FuelShake Tropical Mix - €1.59</span>
+                <button onclick="addToCart('FuelShake Tropical Mix', 1.59)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Bebidas/Lata_Sprite.png" alt="Lata Sprite">
+                <span>Lata Sprite - €1.09</span>
+                <button onclick="addToCart('Lata Sprite', 1.09)">Agregar</button>
+            </div>
+            <!-- Items here -->
+        </div>
+        <div class="menu-section" id="postres">
+            <h2>Postres</h2>
+            <div class="item">
+                <img src="./img_comida/Postres/Fuel_Churros.png" alt="FuelChurros">
+                <span>FuelChurros - €4.50</span>
+                <button onclick="addToCart('FuelChurros', 4.50)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Postres/Tropical_Fuel_Sundae.png" alt="Tropical Fuel Sundae">
+                <span>Tropical Fuel Sundae - €5.50</span>
+                <button onclick="addToCart('Tropical Fuel Sundae', 5.50)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Postres/FuelFugde_Brownie.png" alt="FuelFudge Brownie">
+                <span>FuelFudge Brownie - €4.75</span>
+                <button onclick="addToCart('FuelFudge Brownie', 4.75)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Postres/Speedy_Fuel_Donuts.png" alt="Speedy Fuel Donuts">
+                <span>Speedy Fuel Donuts - €3.50</span>
+                <button onclick="addToCart('Speedy Fuel Donuts', 3.50)">Agregar</button>
+            </div>
+            <div class="item">
+                <img src="./img_comida/Postres/FuelMilk_Shake.png" alt="FuelMilkshake Mix">
+                <span>FuelMilkshake Mix - €4.00</span>
+                <button onclick="addToCart('FuelMilkshake Mix', 4.00)">Agregar</button>
+            </div>
+            <!-- Items here -->
+        </div>
+    </div>
+
+    <!-- Carrito -->
+    <div id="cart">
+        <h3>Carrito</h3>
+        <div id="cart-items"></div>
+        <p><strong>Total:</strong> €<span id="total">0.00</span></p>
+        <button id="pay-button" onclick="openPayModal()">Pagar</button>
+    </div>
+
+    <!-- Modal de pago -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close" onclick="closeModal()">×</button>
+            <h3>Resumen de tu compra</h3>
+            <p>Precio total del menú: <span id="modal-menu-total"></span></p>
+            <p>Total de gasolina: €<span id="payment-amount"></span></p> <!-- Mostrar el precio de la gasolina -->
+            <p>Descuento sobre gasolina: <span id="modal-gasoline-discount"></span></p>
+            <p>Total a pagar: <span id="modal-final-total"></span></p>
+            <button id="pago-button" onclick="confirmPay()">Pagar</button>
+        </div>
+    </div>
+
+    <!-- Modal de agradecimiento -->
+    <div id="thank-you-modal" class="modal">
+        <div class="modal-content">
+            <button class="close" onclick="closeThankYouModal()">×</button>
+            <h3>¡Gracias por tu compra!</h3>
+            <p>Tu pedido ha sido confirmado.</p>
+            <p id="thank-you-discount">Tu numero de orden es: <span id="discount-code"></span></p>
+            <button id="thank-you-button" onclick="closeThankYouModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal cargando de pago -->
+    <div class="modal" id="loading-modal">
+        <div class="modal-content">
+            <p>Procesando el pago...</p>
+            <div class="spinner"></div> <!-- Animación de carga -->
+        </div>
+    </div>
+
+    <script>
+        const cart = [];
+        let total = 0;
+
+        // Función para obtener los parámetros de la URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                codigo: params.get('codigo'),  // Obtener el código de descuento
+                descuento: parseFloat(params.get('descuento')) || 0,  // Obtener el valor del descuento
+            };
+        }
+
+        // Obtener los parámetros de la URL
+        const { codigo, descuento } = getQueryParams();
+        console.log(`Código de descuento: ${codigo}, Valor: ${descuento}€`);
+
+        // Obtener el total de la gasolina desde el localStorage
+        const totalGasolina = parseFloat(localStorage.getItem('totalCost')) || 0;
+        console.log(`Total gasolina: €${totalGasolina}`);
+
+        // Mostrar el precio total de la gasolina en el modal de pago
+        const paymentAmountElement = document.getElementById('payment-amount');
+        if (paymentAmountElement && totalGasolina > 0) {
+            paymentAmountElement.textContent = `€${totalGasolina.toFixed(2)}`; // Muestra el total de la gasolina con 2 decimales
+        } else {
+            paymentAmountElement.textContent = '€0.00'; // Si no hay precio o es 0, mostrar 0
+        }
+
+        // Función para agregar un artículo al carrito
+        function addToCart(name, price) {
+            const existingItem = cart.find(item => item.name === name);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ name, price, quantity: 1 });
+            }
+            total += price;
+            updateCart();
+        }
+
+        // Función para eliminar un artículo del carrito
+        function removeFromCart(index) {
+            total -= cart[index].price * cart[index].quantity;
+            cart.splice(index, 1);  // Eliminar el artículo del array
+            updateCart();  // Actualizar la visualización del carrito
+        }
+
+        // Función para disminuir la cantidad de un artículo
+        function decreaseQuantity(index) {
+            if (cart[index].quantity > 1) {
+                cart[index].quantity -= 1;
+                total -= cart[index].price;
+                updateCart();
+            }
+        }
+
+        // Función para actualizar el carrito visualmente
+        function updateCart() {
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';  // Limpiar los artículos previos
+            
+            let subtotal = 0;  // Subtotal antes del descuento
+            cart.forEach((item, index) => {
+                subtotal += item.price * item.quantity;
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('cart-item');
+                itemElement.innerHTML = `
+                    ${item.name} - €${item.price.toFixed(2)} x${item.quantity}
+                    <button onclick="decreaseQuantity(${index})">-</button>
+                    <button onclick="removeFromCart(${index})">x</button>
+                `;
+                cartItems.appendChild(itemElement);
+            });
+
+            const totalElement = document.getElementById('total');
+            totalElement.textContent = subtotal.toFixed(2);
+        }
+
+        // Función para abrir el modal de pago
+        function openPayModal() {
+            const modal = document.getElementById('modal');
+            const modalMenuTotal = document.getElementById('modal-menu-total');
+            const modalGasolineDiscount = document.getElementById('modal-gasoline-discount');
+            const modalFinalTotal = document.getElementById('modal-final-total');
+            
+            // Calcular el descuento de gasolina (20% de la gasolina)
+            const gasolineDiscount = totalGasolina * 0.2;
+
+            // Calcular el total final (menú + gasolina - descuento sobre gasolina)
+            const totalConDescuento = total + totalGasolina - gasolineDiscount;
+
+            // Mostrar los valores en el modal
+            modalMenuTotal.textContent = `€${total.toFixed(2)}`; // Total del menú
+            modalGasolineDiscount.textContent = `€${gasolineDiscount.toFixed(2)}`; // Descuento sobre la gasolina
+            modalFinalTotal.textContent = `€${totalConDescuento.toFixed(2)}`; // Total a pagar (menú + gasolina - descuento)
+
+            // Mostrar el modal
+            modal.style.display = 'flex';
+        }
+
+        // Función para cerrar el modal de pago
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'none';
+        }
+
+        // Función para confirmar el pago
+        function confirmPay() {
+            const thankYouModal = document.getElementById('thank-you-modal');
+            const discountCodeElement = document.getElementById('discount-code');
+            
+            // Mostrar el código de descuento
+            discountCodeElement.textContent = codigo || 'N/A';
+
+            // Cerrar el modal de pago y abrir el modal de agradecimiento
+            closeModal();
+            thankYouModal.style.display = 'flex';
+        }
+
+        // Función para cerrar el modal de agradecimiento
+        function closeThankYouModal() {
+            const thankYouModal = document.getElementById('thank-you-modal');
+            thankYouModal.style.display = 'none';
+            
+            // Esperar 0.5 segundos y redirigir a la página de gasolinera
+            setTimeout(() => {
+                // Recargar la página de menú
+                location.reload();
+
+                // Redirigir a la página de la gasolinera
+                // Aquí asegúrate de tener la URL de la página de gasolinera correctamente configurada
+                window.location.href = 'gasolinera.html';  // Modificar 'gasolinera.html' con la URL correcta
+            }, 500);  // 500 milisegundos = 0.5 segundos
+        }
+
+        // Función para hacer scroll hacia la sección correspondiente
+        function scrollToSection(sectionId) {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    // Realizar scroll suave hacia la sección
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    console.error(`Sección con ID "${sectionId}" no encontrada.`);
+                }
+            }
+            
+    </script>
+
+
+
+    
+</body>
+</html>

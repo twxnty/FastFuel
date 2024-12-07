@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecciona tu Combustible</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 90vh;
+            margin: 0;
+            background-color: #ffffff;
+            color: #202020  
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 60px;
+            color: #ffffff;
+        }
+
+        .fuel-options {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .fuel-option {
+            cursor: pointer;
+            
+            border: 7px solid #434343;
+            transition: all 0.6s ease;
+            position: relative;
+            width: 220px;
+            border-radius: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fuel-option:hover {
+            background-color: #181818;
+            box-shadow: 0 0 20px rgb(255, 64, 0);
+            border-color: rgb(255, 64, 0);
+            color: rgb(255, 64, 0);
+            .price{
+                transition: all 0.6s ease;
+                color: rgb(255, 64, 0);
+            }
+        }
+
+        .fuel-option span:nth-child(n){
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 3px solid;
+            transition: all 0.6s ease;
+        }
+
+        .fuel-option span:nth-child(1){
+            right: 5%;
+            top: -3.9%;
+            background-color: rgb(0 0 0 / 0%);
+            border-color: rgb(0 0 0 / 0%);
+        }
+
+        .fuel-option span:nth-child(2){
+            left: 10%;
+            bottom: -3.9%;
+            background-color: rgb(0 0 0 / 0%);
+            border-color: rgb(0 0 0 / 0%);
+        }
+
+        .fuel-option:hover span:nth-child(1){
+            right: 75%;
+            background-color: rgb(255, 64, 0);
+            border-color: rgb(255, 64, 0);
+            transform: rotate(90deg);
+        }
+
+        .fuel-option:hover span:nth-child(2){
+            left: 75%;
+            border-color: rgb(255, 64, 0);
+            background-color: #000;
+            transform: rotate(90deg);
+        }
+
+        .fuel-option img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+        }
+
+        .fuel-info {
+            padding: 10px;
+        }
+
+        .fuel-info p {
+            margin: 5px 0;
+            font-size: 1.2rem;
+            font-weight: 900;
+        }
+
+        .price {
+            transition: all 0.6s ease;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #202020;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border: 7px solid #FF4500;
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            color: #FF4500;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal button {
+            padding: 12px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            background: #FF4500;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+
+        .modal button:hover {
+            background: #FF6347;
+        }
+
+        .discount-code {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #FFD700;
+        }
+
+        .imglogo {
+            width: 25%;
+            animation: constant-heartbeat 15.0s infinite linear;
+        }
+
+        @keyframes constant-heartbeat {
+            0%, 50%, 100% {
+                transform: scale(1);
+            }
+            25%, 75% {
+                transform: scale(1.2);
+            }
+        }
+
+        .modal-content p {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            color: #FF4500;
+        }
+        
+        /* Modal de error */
+        #error-modal .modal-content {
+            background: white;
+            border: 7px solid #FF4500;
+            color: #FF4500;
+        }
+
+        #error-modal button {
+            background-color: #FF4500;
+            color: white;
+            transition: background 0.3s;
+        }
+
+        #error-modal button:hover {
+            background: #FF6347;
+        }
+
+        /* Estilo para el modal de carga */
+        #loading-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        /* Ajustes para centrar el spinner */
+    #loading-modal .modal-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centra horizontalmente */
+        justify-content: center; /* Centra verticalmente */
+        background: #ffffff;
+        border: 7px solid #FF4500;
+        padding: 20px;
+        text-align: center;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        color: #FF4500;
+        width: 90%;
+        max-width: 400px;
+        height: 200px; /* Asegúrate de tener una altura fija */
+    }
+
+        #loading-modal p {
+            font-size: 1.2rem;
+            color: #FF4500;
+            margin: 10px 0;
+        }
+
+        /* Estilo para el spinner */
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #FF4500;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        /* Animación de rotación del spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <h1> <img class="imglogo" src="img_fastfuel/horizontal_logo.svg" alt=""> </h1>
+        <div class="fuel-options">
+            <div class="fuel-option" data-fuel="Gasolina 98" data-price="1.85">
+                <span></span>
+                <span></span>
+                <img src="img_fastfuel/98.png" alt="Gasolina 98">
+                <div class="fuel-info">
+                    <p>Gasolina 98</p>
+                    <p class="price">1.85 €/L</p>
+                </div>
+            </div>
+            <div class="fuel-option" data-fuel="Gasolina 95" data-price="1.70">
+                <span></span>
+                <span></span>
+                <img src="img_fastfuel/95.png" alt="Gasolina 95">
+                <div class="fuel-info">
+                    <p>Gasolina 95</p>
+                    <p class="price">1.70 €/L</p>
+                </div>
+            </div>
+            <div class="fuel-option" data-fuel="GLP" data-price="0.95">
+                <span></span>
+                <span></span>
+                <img src="img_fastfuel/glp.png" alt="GLP">
+                <div class="fuel-info">
+                    <p>GLP</p>
+                    <p class="price">0.95 €/L</p>
+                </div>
+                
+            </div>
+            <div class="fuel-option" data-fuel="Eléctrico" data-price="0.30">
+                <span></span>
+                <span></span>
+                <img src="img_fastfuel/electric.png" alt="Eléctrico">
+                <div class="fuel-info">
+                    <p>Eléctrico</p>
+                    <p class="price">0.30 €/kWh</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <p id="modal-message"></p>
+            <button id="confirm-fuel">Aceptar</button>
+            <button id="cancel-fuel">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="food-modal">
+        <div class="modal-content">
+            <p>¿Deseas comer en el lugar?</p>
+            <p id="gas-price-modal">El total de la gasolina es: €0.00</p> <!-- Aquí se mostrará el precio total -->
+            <button id="yes-food">Sí</button>
+            <button id="no-food">No</button>
+        </div>
+    </div>
+    
+
+    <!-- Modal para ingresar la cantidad de combustible -->
+    <div class="modal" id="quantity-modal">
+        <div class="modal-content">
+            <p id="fuel-quantity-letter">¿Cuántos litros de <span id="fuel-type"></span> deseas?</p>
+            <input type="number" id="fuel-quantity" placeholder="Introduce la cantidad en litros" min="1" style="padding: 10px; width: 80%; border-radius: 10px; margin: 10px;">
+            <button id="confirm-quantity">Aceptar</button>
+            <button id="cancel-quantity">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="discount-modal">
+        <div class="modal-content">
+            <p>Tu código de descuento es:</p>
+            <p class="discount-code" id="discount-code"></p>
+            <button id="close-discount">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="payment-confirmation-modal">
+        <div class="modal-content">
+            <p>¡Pago aceptado!</p>
+            <button id="close-payment">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de simulación de pago -->
+    <div class="modal" id="payment-simulation-modal">
+        <div class="modal-content">
+            <p>Procesando el pago...</p>
+            <p>¡Pago completado!</p>
+            <button id="close-simulation">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de agradecimiento -->
+    <div class="modal" id="thank-you-modal">
+        <div class="modal-content">
+            <p>¡Gracias por su compra!</p>
+            <p>¡Hasta luego!</p>
+            <button id="close-thank-you">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div class="modal" id="error-modal">
+        <div class="modal-content">
+            <p id="error-message">Por favor, introduce una cantidad válida de combustible.</p>
+            <button id="close-error">Cerrar</button>
+        </div>
+    </div>
+
+        <!-- Modal de pago -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content">
+            <p>El total a pagar es: <span id="payment-amount"></span> €</p>
+            <button id="confirm-payment">Pagar con tarjeta</button>
+            <button id="cancel-payment">Cancelar pago</button>
+        </div>
+    </div>
+
+        <!-- Modal cargando de pago -->
+    <div class="modal" id="loading-modal">
+        <div class="modal-content">
+            <p>Procesando el pago...</p>
+            <div class="spinner"></div> <!-- Esto es para la animación de carga -->
+        </div>
+    </div>    
+
+
+    <script>
+        const cambiarTitulo = document.getElementById('fuel-quantity-letter');
+
+        const fuelOptions = document.querySelectorAll('.fuel-option');
+        const modal = document.getElementById('modal');
+        const foodModal = document.getElementById('food-modal');
+        const discountModal = document.getElementById('discount-modal');
+        const paymentModal = document.getElementById('payment-modal');
+        const paymentConfirmationModal = document.getElementById('payment-confirmation-modal');
+        const modalMessage = document.getElementById('modal-message');
+        const confirmFuelButton = document.getElementById('confirm-fuel');
+        const cancelFuelButton = document.getElementById('cancel-fuel');
+        const yesFoodButton = document.getElementById('yes-food');
+        const noFoodButton = document.getElementById('no-food');
+        const closeDiscountButton = document.getElementById('close-discount');
+        const confirmPaymentButton = document.getElementById('confirm-payment');
+        const closePaymentButton = document.getElementById('close-payment');
+        const discountCodeElement = document.getElementById('discount-code');
+
+        const quantityModal = document.getElementById('quantity-modal');
+        const fuelQuantityInput = document.getElementById('fuel-quantity');
+        const confirmQuantityButton = document.getElementById('confirm-quantity');
+        const cancelQuantityButton = document.getElementById('cancel-quantity');
+        const fuelTypeSpan = document.getElementById('fuel-type');
+
+        const paymentSimulationModal = document.getElementById('payment-simulation-modal');
+        const closeSimulationButton = document.getElementById('close-simulation');
+
+        const thankYouModal = document.getElementById('thank-you-modal');
+        const closeThankYouButton = document.getElementById('close-thank-you');
+
+        let selectedFuel = '';
+        let selectedPrice = 0;
+
+        let nombre='';
+
+        fuelOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const fuelName = option.getAttribute('data-fuel');
+                const fuelPrice = option.getAttribute('data-price');
+                nombre = fuelName;
+                if(fuelName!='Eléctrico')
+                {
+                    selectedFuel = `${fuelName} - ${fuelPrice} €/L`;
+                }else{
+                    selectedFuel = `${fuelName} - ${fuelPrice} €/kWh`;
+                }
+                modalMessage.textContent = `¿Aceptas ${selectedFuel}?`;
+                modal.style.display = 'flex';
+            });
+        });
+
+        confirmFuelButton.addEventListener('click', () => {
+            modal.style.display = 'none'; // Cierra el modal del combustible
+            foodModal.style.display = 'none'; // Muestra el modal de comida
+
+            if (nombre === 'Eléctrico') {
+                fuelQuantityInput.placeholder = 'Introduce la cantidad en kWh';
+                cambiarTitulo.textContent = `¿Cuántos kWh de ${nombre} deseas?`;
+            } else {
+                fuelQuantityInput.placeholder = 'Introduce la cantidad en litros';
+                cambiarTitulo.textContent = `¿Cuántos litros de ${nombre} deseas?`;
+            }
+
+            quantityModal.style.display = 'flex';
+        });
+
+        cancelFuelButton.addEventListener('click', () => {
+            modal.style.display = 'none'; // Solo cierra el modal de combustible
+            selectedFuel = ''; // Resetea la selección previa
+        });
+
+        yesFoodButton.addEventListener('click', () => {
+            const discountCode = window.fuelDiscountCode || `${generateCode()}-${generateCode()}`;
+            const discount = window.fuelDiscountAmount || '0.00';
+
+            // Redirigir a la página del menú
+            window.location.href = `menu.html?codigo=${discountCode}&descuento=${discount}`;
+        });
+
+        noFoodButton.addEventListener('click', () => {
+            // Cerrar el modal de comida
+            foodModal.style.display = 'none';
+
+            // Calcular el total a pagar (esto depende del tipo de combustible seleccionado y la cantidad)
+            const quantity = parseFloat(fuelQuantityInput.value);
+            const totalCost = quantity * selectedPrice;
+
+            // Mostrar el precio en el modal de pago
+            const paymentModal = document.getElementById('payment-modal');
+            const paymentAmount = document.getElementById('payment-amount');
+            paymentAmount.textContent = totalCost.toFixed(2); // Muestra el precio con dos decimales
+
+            // Mostrar el modal de pago
+            paymentModal.style.display = 'flex';
+        });
+
+        // Listener para cerrar el modal de simulación de pago
+        closeSimulationButton.addEventListener('click', () => {
+            paymentSimulationModal.style.display = 'none';
+            thankYouModal.style.display = 'flex'; // Mostrar modal de agradecimiento
+        });
+
+        // Listener para cerrar el modal de agradecimiento
+        closeThankYouButton.addEventListener('click', () => {
+            thankYouModal.style.display = 'none';
+        });
+
+        closeDiscountButton.addEventListener('click', () => {
+            discountModal.style.display = 'none';
+        });
+
+        // Confirmar pago
+
+        confirmPaymentButton.addEventListener('click', () => {
+            // Ocultar cualquier modal previo (opcional)
+            paymentModal.style.display = 'none'; // Asegúrate de que `paymentModal` existe y tiene este ID
+
+            // Mostrar el modal de carga
+            showLoadingModal();
+
+            // Simulación del procesamiento de pago
+            setTimeout(() => {
+                hideLoadingModal(); // Ocultar el modal de carga después de un tiempo
+                paymentConfirmationModal.style.display = 'flex'; // Mostrar el modal de confirmación
+            }, 3000); // Ajusta el tiempo de simulación
+        });
+
+        const cancelPaymentButton = document.getElementById('cancel-payment');
+        cancelPaymentButton.addEventListener('click', () => {
+            // Cerrar el modal de pago
+            paymentModal.style.display = 'none';
+        });
+
+        closePaymentButton.addEventListener('click', () => {
+            paymentConfirmationModal.style.display = 'none';
+        });
+
+         // Mostrar modal para la cantidad al confirmar el tipo de combustible
+        confirmFuelButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+            fuelTypeSpan.textContent = selectedFuel.split(' - ')[0]; // Extraer el tipo de combustible
+            if(fuelTypeSpan!='Eléctrico'){
+                selectedPrice = parseFloat(selectedFuel.split(' - ')[1].replace('€/L', '')); // Extraer el precio
+            }else{
+                selectedPrice = parseFloat(selectedFuel.split(' - ')[1].replace('€/kWh', '')); // Extraer el precio
+            }
+            quantityModal.style.display = 'flex';
+        });
+
+        // Confirmar cantidad y mostrar el modal de comida
+        confirmQuantityButton.addEventListener('click', () => {
+            const quantity = parseFloat(fuelQuantityInput.value);
+            if (!isNaN(quantity) && quantity > 0) {
+                // Calcular el precio total de la gasolina
+                const totalCost = quantity * selectedPrice;
+
+                // Guardar el total de gasolina en localStorage
+                localStorage.setItem('totalCost', totalCost.toFixed(2));  // Guardar en localStorage
+
+                // Aplicar descuento (opcional)
+                const discount = totalCost * 0.2; // 20% de descuento
+                const discountCode = `${generateCode()}-${generateCode()}`;
+
+                // Guardar los datos de descuento (si es necesario)
+                window.fuelDiscountCode = discountCode;
+                window.fuelDiscountAmount = discount.toFixed(2);
+
+                // Ocultar el modal de cantidad y mostrar el modal de comida
+                quantityModal.style.display = 'none';
+                foodModal.style.display = 'flex';
+
+                // Actualizar el precio en el modal de comida
+                const gasPriceModal = document.getElementById('gas-price-modal');
+                gasPriceModal.textContent = `El total de la gasolina es: €${totalCost.toFixed(2)}`;
+            } else {
+                // Mostrar el modal de error si la cantidad no es válida
+                const errorModal = document.getElementById('error-modal');
+                const closeErrorButton = document.getElementById('close-error');
+
+                errorModal.style.display = 'flex'; // Muestra el modal de error
+
+                // Cerrar el modal de error al hacer clic en el botón de cierre
+                closeErrorButton.addEventListener('click', () => {
+                    errorModal.style.display = 'none'; // Oculta el modal de error
+                });
+            }
+        });
+
+        // Cancelar cantidad
+        cancelQuantityButton.addEventListener('click', () => {
+            quantityModal.style.display = 'none';
+        });
+
+        function generateCode() {
+            return Math.random().toString(36).substr(2, 4).toUpperCase();
+        }
+
+        // Obtener referencia al modal
+        const loadingModal = document.getElementById('loading-modal');
+
+        // Activar el modal de carga
+        function showLoadingModal() {
+            loadingModal.style.display = 'flex'; // Mostrar el modal
+        }
+
+        // Cerrar el modal de carga
+        function hideLoadingModal() {
+            loadingModal.style.display = 'none'; // Ocultar el modal
+        }
+    </script>
+
+</body>
+</html>
