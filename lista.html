@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos</title>
+<style>
+/* Estilo general de la p  gina */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+/* T  tulo de la p  gina */
+h1 {
+  text-align: center;
+    color: #333;
+    font-size: 2.5em;
+}
+
+/* Estilo para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Encabezado de la tabla */
+th {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 1.1em;
+}
+
+/* Fila de la tabla al pasar el cursor */
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estilo de las celdas */
+td {
+    font-size: 1em;
+    color: #333;
+}
+
+/* Bot  n "Producto acabado" */
+button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+
+background-color: #c0392b;
+
+}
+
+/* Estilo para los detalles del pedido (listas dentro de la tabla) */
+.details {
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Estilo para la fila con detalles de comida */
+.details span {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Estilo de la fila de total */
+.total {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Estilo para el mensaje de no pedidos */
+.no-orders {
+    text-align: center;
+    font-size: 1.2em;
+    color: #888;
+    margin-top: 50px;
+}
+
+/* Para dispositivos peque  os */
+
+@media (max-width: 768px) {
+    table, th, td {
+        font-size: 0.9em;
+        padding: 8px;
+    }
+
+    button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .container {
+        padding: 10px;
+    }
+}
+</style>
+</head>
+<body>
+    <h1>Lista de Pedidos</h1>
+    <table id="tabla-pedidos">
+        <thead>
+            <tr>
+                <th>C  digo de Compra</th>
+                <th>Comidas</th>
+                <th>Precio Total</th>
+                <th>Combustible</th>
+                <th>Descuento</th>
+                <th>Total a Pagar</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Las filas de pedidos se agregar  n din  micamente aqu   -->
+        </tbody>
+    </table>
+    <script>
+        // Funci  n para obtener los pedidos desde el servidor
+        function getPedidos() {
+            fetch('http://172.19.0.6:3000/pedidos')
+                .then(response => response.json())
+                .then(pedidos => {
+                    const tablaPedidos = document.getElementById('tabla-pedidos').getElementsByTagName('tbody')[0];
+                    tablaPedidos.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos pedidos
+
+                    pedidos.forEach(pedido => {
+                    // Crear una nueva fila para cada pedido
+                    const fila = document.createElement('tr');
+
+                    // Crear la celda con el c  digo de compra
+                    const celdaCodigo = document.createElement('td');
+                    celdaCodigo.textContent = pedido.codigo_compra;
+                    fila.appendChild(celdaCodigo);
+
+                    // Crear la celda con las comidas
+                    const celdaComidas = document.createElement('td');
+                    const comidas = pedido.comidas.map(comida => `${comida.nombre_comida} x${comida.cantidad}`).join('<br>');
+                    celdaComidas.innerHTML = comidas;
+                    fila.appendChild(celdaComidas);
+
+                    // Crear la celda con el precio total de las comidas
+                    const precioComidas = pedido.comidas.reduce((sum, comida) => sum + parseFloat(comida.precio_total), 0).toFixed(2);
+                    const celdaPrecioTotal = document.createElement('td');
+                    celdaPrecioTotal.textContent = ` ^b ${precioComidas}`;
+                    fila.appendChild(celdaPrecioTotal);
+
+                    // Crear la celda con el precio de combustible
+                    const celdaCombustible = document.createElement('td');
+                    celdaCombustible.textContent = ` ^b ${pedido.total_combustible.toFixed(2)}`;
+                    fila.appendChild(celdaCombustible);
+
+                    // Crear la celda con el descuento
+                    const celdaDescuento = document.createElement('td');
+                    celdaDescuento.textContent = ` ^b ${pedido.descuento.toFixed(2)}`;
+                    fila.appendChild(celdaDescuento);
+
+                    // Crear la celda con el total a pagar
+                    const celdaTotalPagar = document.createElement('td');
+                    celdaTotalPagar.textContent = ` ^b ${pedido.total_pagar.toFixed(2)}`;
+                    fila.appendChild(celdaTotalPagar);
+
+                    // Crear la celda con el bot  n "Producto acabado"
+                    const celdaAcciones = document.createElement('td');
+                    const botonEliminar = document.createElement('button');
+                    botonEliminar.classList.add('button-eliminar');
+                    botonEliminar.textContent = 'Producto acabado';
+                    botonEliminar.onclick = () => marcarComoFinalizado(pedido.codigo_compra);
+                    celdaAcciones.appendChild(botonEliminar);
+                    fila.appendChild(celdaAcciones);
+                // Agregar la fila a la tabla
+                tablaPedidos.appendChild(fila);
+            });
+        })
+        .catch(error => console.error('Error al obtener los pedidos:', error));
+    }
+
+// Funci  n para marcar el pedido como finalizado y eliminarlo
+function marcarComoFinalizado(codigoCompra) {
+    fetch(`http://172.19.0.6:3000/eliminarPedido/${codigoCompra}`, {
+        method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(data => {
+            console.log(data.message);
+            getPedidos(); // Actualizar la lista de pedidos
+        })
+        .catch(error => console.error('Error al eliminar el pedido:', error));
+    }
+    // Llamar a la funci  n para obtener los pedidos al cargar la p  gina
+    window.onload = getPedidos;
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
